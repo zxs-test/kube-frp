@@ -1,0 +1,67 @@
+// Copyright 2018 fatedier, fatedier@gmail.com
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package main
+
+import (
+	"context"
+	"fmt"
+	"os"
+	"path/filepath"
+
+	v1 "github.com/fatedier/frp/pkg/config/v1"
+	"github.com/fatedier/frp/pkg/k8s"
+)
+
+var (
+	frpServerName      string
+	frpServerNamespace string
+	kubeconfig         string
+)
+
+func init() {
+	rootCmd.PersistentFlags().StringVar(&frpServerName, "frp-server-name", "", "Name of the FRPServer CR")
+	rootCmd.PersistentFlags().StringVar(&frpServerNamespace, "frp-server-namespace", "default", "Namespace of the FRPServer CR")
+	rootCmd.PersistentFlags().StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file")
+}
+
+// loadCRConfig loads configuration from FRPServer CR
+func loadCRConfig(frpServerName string, frpServerNamespace string, kubeconfig string) (*v1.ServerConfig, error) {
+	if kubeconfig == "" {
+		kubeconfig = os.Getenv("KUBECONFIG")
+		if kubeconfig == "" {
+			home, err := os.UserHomeDir()
+			if err != nil {
+				return nil, fmt.Errorf("failed to get user home directory: %v", err)
+			}
+			kubeconfig = filepath.Join(home, ".kube", "config")
+		}
+	}
+
+	k8sClient, err := k8s.NewClient(kubeconfig)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create Kubernetes client: %v", err)
+	}
+
+	svrCfg, err := k8sClient.LoadServerConfig(context.Background(), frpServerName, frpServerNamespace)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load configuration from FRPServer CR: %v", err)
+	}
+
+	if svrCfg != nil {
+		svrCfg.Complete()
+	}
+
+	return svrCfg, nil
+}

@@ -1,0 +1,23 @@
+2025-04-08 07:53:39.159 [I] [server/dashboard_api.go:107] Http request: [/api/serverinfo]
+2025-04-08 07:53:39.166 [I] [server/dashboard_api.go:100] Http response [/api/serverinfo]: code [200]
+2025-04-08 07:55:55.619 [W] [server/manager.go:89] [reqid: 0d72903859f7a077] send Login request to plugin [user-manager] error: Post "http://127.0.0.1:9000/handler?op=Login&version=0.1.0": dial tcp 127.0.0.1:9000: connect: connection refused
+2025-04-08 07:55:55.620 [W] [server/service.go:452] register control error: send Login request to plugin error
+2025-04-08 07:57:13.280 [W] [server/manager.go:89] [reqid: b64d5d3e70c93e31] send Login request to plugin [user-manager] error: Post "http://127.0.0.1:9000/handler?op=Login&version=0.1.0": dial tcp 127.0.0.1:9000: connect: connection refused
+2025-04-08 07:57:13.280 [W] [server/service.go:452] register control error: send Login request to plugin error
+2025-04-08 07:57:25.818 [W] [server/manager.go:89] [reqid: 9c96a056273afcdf] send Login request to plugin [user-manager] error: Post "http://127.0.0.1:9000/handler?op=Login&version=0.1.0": dial tcp 127.0.0.1:9000: connect: connection refused
+2025-04-08 07:57:25.818 [W] [server/service.go:452] register control error: send Login request to plugin error
+2025-04-08 07:58:08.552 [W] [server/manager.go:89] [reqid: 51864a6b650fa2a6] send Login request to plugin [user-manager] error: Post "http://127.0.0.1:9000/handler?op=Login&version=0.1.0": dial tcp 127.0.0.1:9000: connect: connection refused
+2025-04-08 07:58:08.552 [W] [server/service.go:452] register control error: send Login request to plugin error
+2025-04-08 08:00:05.806 [I] [frps/root.go:105] frps uses config file: conf/frps_full_example.toml
+2025-04-08 08:00:05.967 [I] [server/service.go:193] plugin [user-manager] has been registered
+2025-04-08 08:00:05.967 [I] [server/service.go:193] plugin [port-manager] has been registered
+2025-04-08 08:00:05.967 [I] [server/service.go:237] frps tcp listen on 0.0.0.0:17000
+2025-04-08 08:00:05.967 [I] [server/service.go:246] frps kcp listen on udp 0.0.0.0:17000
+2025-04-08 08:00:05.967 [I] [server/service.go:305] http service listen on 0.0.0.0:80
+2025-04-08 08:00:05.967 [I] [server/service.go:319] https service listen on 0.0.0.0:443
+2025-04-08 08:00:05.967 [I] [frps/root.go:114] frps started successfully
+2025-04-08 08:00:05.967 [I] [server/service.go:351] dashboard listen on 127.0.0.1:7500
+2025-04-08 08:00:08.206 [I] [server/dashboard_api.go:107] Http request: [/api/serverinfo]
+2025-04-08 08:00:08.206 [I] [server/dashboard_api.go:100] Http response [/api/serverinfo]: code [200]
+2025-04-08 08:01:11.220 [I] [server/dashboard_api.go:107] Http request: [/api/serverinfo]
+2025-04-08 08:01:11.221 [I] [server/dashboard_api.go:100] Http response [/api/serverinfo]: code [200]

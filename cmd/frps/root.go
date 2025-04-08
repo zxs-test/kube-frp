@@ -41,8 +41,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVarP(&cfgFile, "config", "c", "", "config file of frps")
 	rootCmd.PersistentFlags().BoolVarP(&showVersion, "version", "v", false, "version of frps")
 	rootCmd.PersistentFlags().BoolVarP(&strictConfigMode, "strict_config", "", true, "strict config parsing mode, unknown fields will cause errors")
-
 	config.RegisterServerConfigFlags(rootCmd, &serverCfg)
+
 }
 
 var rootCmd = &cobra.Command{
@@ -59,11 +59,13 @@ var rootCmd = &cobra.Command{
 			isLegacyFormat bool
 			err            error
 		)
-		if cfgFile != "" {
+
+		if frpServerName != "" {
+			svrCfg, err = loadCRConfig(frpServerName, frpServerNamespace, kubeconfig)
+		} else if cfgFile != "" {
 			svrCfg, isLegacyFormat, err = config.LoadServerConfig(cfgFile, strictConfigMode)
 			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
+				return err
 			}
 			if isLegacyFormat {
 				fmt.Printf("WARNING: ini format is deprecated and the support will be removed in the future, " +
@@ -79,13 +81,11 @@ var rootCmd = &cobra.Command{
 			fmt.Printf("WARNING: %v\n", warning)
 		}
 		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			return err
 		}
 
 		if err := runServer(svrCfg); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
+			return err
 		}
 		return nil
 	},
@@ -103,6 +103,8 @@ func runServer(cfg *v1.ServerConfig) (err error) {
 
 	if cfgFile != "" {
 		log.Infof("frps uses config file: %s", cfgFile)
+	} else if frpServerName != "" {
+		log.Infof("frps uses FRPServer CR: %s/%s", frpServerNamespace, frpServerName)
 	} else {
 		log.Infof("frps uses command line arguments for config")
 	}

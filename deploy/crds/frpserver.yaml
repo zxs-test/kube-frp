@@ -1,0 +1,70 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: frpservers.frp.io
+spec:
+  group: frp.io
+  names:
+    kind: FrpServer
+    listKind: FrpServerList
+    plural: frpservers
+    singular: frpserver
+    shortNames:
+      - frps
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      schema:
+        openAPIV3Schema:
+          type: object
+          properties:
+            spec:
+              type: object
+              required:
+                - serviceAddress
+                - servicePort
+                - authToken
+              properties:
+                serviceAddress:
+                  type: string
+                  description: "The address where the frp server will be exposed"
+                servicePort:
+                  type: integer
+                  description: "The port where the frp server will listen (default: 7000)"
+                authToken:
+                  type: string
+                  description: "Token used for authentication between client and server"
+                allowedPorts:
+                  type: array
+                  description: "List of ports that are allowed to be exposed"
+                  items:
+                    type: integer
+            status:
+              type: object
+              properties:
+                clientConnections:
+                  type: array
+                  description: "Information about connected clients"
+                  items:
+                    type: object
+                    properties:
+                      clientID:
+                        type: string
+                        description: "Unique identifier of the client"
+                      localPort:
+                        type: integer
+                        description: "Port exposed on the service address"
+                      remotePort:
+                        type: integer
+                        description: "Port on the client side"
+                      protocol:
+                        type: string
+                        description: "Protocol being used (tcp/udp)"
+                      connectedAt:
+                        type: string
+                        format: date-time
+                        description: "Timestamp when the client connected"
+      subresources:
+        status: {} 

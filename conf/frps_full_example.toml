@@ -4,11 +4,11 @@
 # in square brackets, as in "[::1]:80", "[ipv6-host]:http" or "[ipv6-host%zone]:80"
 # For single "bindAddr" field, no need square brackets, like `bindAddr = "::"`.
 bindAddr = "0.0.0.0"
-bindPort = 7000
+bindPort = 17000
 
 # udp port used for kcp protocol, it can be same with 'bindPort'.
 # if not set, kcp is disabled in frps.
-kcpBindPort = 7000
+kcpBindPort = 17000
 
 # udp port used for quic protocol.
 # if not set, quic is disabled in frps.

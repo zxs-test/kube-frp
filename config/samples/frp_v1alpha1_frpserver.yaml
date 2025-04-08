@@ -1,0 +1,20 @@
+apiVersion: frp.kubeinfra.io/v1alpha1
+kind: FRPServer
+metadata:
+  name: frpserver-sample
+  namespace: default
+spec:
+  version: "v1"
+  
+  # Basic server configuration
+  bindAddr: "0.0.0.0"
+  bindPort: 17000
+  kcpBindPort: 17000
+  proxyBindAddr: "0.0.0.0"
+  
+  # Dashboard configuration
+  webServer:
+    port: 7500
+    addr: "0.0.0.0"
+    user: "admin"
+    password: "admin"

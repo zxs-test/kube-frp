@@ -1,0 +1,17 @@
+2025-04-07 23:48:14.752 [I] [frps/root.go:105] frps uses config file: conf/frps_full_example.toml
+2025-04-07 23:48:14.810 [I] [server/service.go:193] plugin [user-manager] has been registered
+2025-04-07 23:48:14.810 [I] [server/service.go:193] plugin [port-manager] has been registered
+2025-04-07 23:48:44.803 [I] [frps/root.go:105] frps uses config file: conf/frps_full_example.toml
+2025-04-07 23:48:45.059 [I] [server/service.go:193] plugin [user-manager] has been registered
+2025-04-07 23:48:45.059 [I] [server/service.go:193] plugin [port-manager] has been registered
+2025-04-07 23:49:29.825 [I] [frps/root.go:105] frps uses config file: conf/frps_full_example.toml
+2025-04-07 23:49:30.075 [I] [server/service.go:193] plugin [user-manager] has been registered
+2025-04-07 23:49:30.075 [I] [server/service.go:193] plugin [port-manager] has been registered
+2025-04-07 23:49:30.075 [I] [server/service.go:237] frps tcp listen on 0.0.0.0:17000
+2025-04-07 23:49:30.075 [I] [server/service.go:246] frps kcp listen on udp 0.0.0.0:17000
+2025-04-07 23:49:30.075 [I] [server/service.go:305] http service listen on 0.0.0.0:80
+2025-04-07 23:49:30.075 [I] [server/service.go:319] https service listen on 0.0.0.0:443
+2025-04-07 23:49:30.075 [I] [frps/root.go:114] frps started successfully
+2025-04-07 23:49:30.075 [I] [server/service.go:351] dashboard listen on 127.0.0.1:7500
+2025-04-07 23:49:32.313 [I] [server/dashboard_api.go:107] Http request: [/api/serverinfo]
+2025-04-07 23:49:32.314 [I] [server/dashboard_api.go:100] Http response [/api/serverinfo]: code [200]

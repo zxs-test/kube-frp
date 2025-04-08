@@ -1,0 +1,733 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.14.0
+  name: frpservers.frp.kubeinfra.io
+spec:
+  group: frp.kubeinfra.io
+  names:
+    kind: FRPServer
+    listKind: FRPServerList
+    plural: frpservers
+    singular: frpserver
+  scope: Namespaced
+  versions:
+  - additionalPrinterColumns:
+    - jsonPath: .status.ready
+      name: Ready
+      type: boolean
+    - jsonPath: .status.serviceStatus.totalConnections
+      name: Connections
+      type: integer
+    - jsonPath: .status.serviceStatus.totalClients
+      name: Clients
+      type: integer
+    - jsonPath: .metadata.creationTimestamp
+      name: Age
+      type: date
+    name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: FRPServer is the Schema for the frpservers API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: FRPServerSpec defines the configuration for the FRP server
+            properties:
+              allowPorts:
+                description: AllowPorts specifies the allowed ports for proxy
+                items:
+                  description: PortsRange defines a range of ports
+                  properties:
+                    end:
+                      description: End specifies the end port
+                      type: integer
+                    start:
+                      description: Start specifies the start port
+                      type: integer
+                  required:
+                  - end
+                  - start
+                  type: object
+                type: array
+              auth:
+                description: Auth specifies the authentication configuration
+                properties:
+                  additionalScopes:
+                    description: AdditionalScopes specifies additional authentication
+                      scopes
+                    items:
+                      description: AuthScope defines the authentication scope
+                      type: string
+                    type: array
+                  method:
+                    default: token
+                    description: Method specifies the authentication method
+                    enum:
+                    - token
+                    - oidc
+                    type: string
+                  oidc:
+                    description: OIDC specifies the OIDC authentication configuration
+                    properties:
+                      audience:
+                        description: |-
+                          Audience specifies the audience OIDC tokens should contain when validated.
+                          If this value is empty, audience ("client ID") verification will be skipped.
+                        type: string
+                      issuer:
+                        description: |-
+                          Issuer specifies the issuer to verify OIDC tokens with. This issuer
+                          will be used to load public keys to verify signature and will be compared
+                          with the issuer claim in the OIDC token.
+                        type: string
+                      skipExpiryCheck:
+                        description: |-
+                          SkipExpiryCheck specifies whether to skip checking if the OIDC token is
+                          expired.
+                        type: boolean
+                      skipIssuerCheck:
+                        description: |-
+                          SkipIssuerCheck specifies whether to skip checking if the OIDC token's
+                          issuer claim matches the issuer specified in OidcIssuer.
+                        type: boolean
+                    type: object
+                  token:
+                    description: Token specifies the authentication token
+                    type: string
+                type: object
+              bindAddr:
+                default: 0.0.0.0
+                description: |-
+                  BindAddr specifies the address that the server binds to. By default,
+                  this value is "0.0.0.0".
+                type: string
+              bindPort:
+                default: 7000
+                description: |-
+                  BindPort specifies the port that the server listens on. By default, this
+                  value is 7000.
+                type: integer
+              custom404Page:
+                description: |-
+                  Custom404Page specifies a path to a custom 404 page to display. If this
+                  value is "", a default page will be displayed.
+                type: string
+              detailedErrorsToClient:
+                default: true
+                description: |-
+                  DetailedErrorsToClient defines whether to send the specific error (with
+                  debug info) to frpc. By default, this value is true.
+                type: boolean
+              enablePrometheus:
+                description: |-
+                  EnablePrometheus will export prometheus metrics on webserver address
+                  in /metrics api.
+                type: boolean
+              httpPlugins:
+                description: HTTPPlugins specifies the HTTP plugin configuration
+                items:
+                  description: HTTPPluginOptions defines the HTTP plugin configuration
+                  properties:
+                    addr:
+                      description: Addr specifies the plugin address
+                      type: string
+                    name:
+                      description: Name specifies the plugin name
+                      type: string
+                    ops:
+                      description: Ops specifies the plugin operations
+                      items:
+                        type: string
+                      type: array
+                    path:
+                      description: Path specifies the plugin path
+                      type: string
+                    tlsVerify:
+                      description: TLSVerify specifies whether to verify TLS
+                      type: boolean
+                  required:
+                  - addr
+                  - name
+                  - ops
+                  - path
+                  type: object
+                type: array
+              kcpBindPort:
+                description: |-
+                  KCPBindPort specifies the KCP port that the server listens on. If this
+                  value is 0, the server will not listen for KCP connections.
+                type: integer
+              log:
+                description: Log specifies the logging configuration
+                properties:
+                  disablePrintColor:
+                    description: DisablePrintColor disables log colors when log.to
+                      is "console".
+                    type: boolean
+                  level:
+                    default: info
+                    description: |-
+                      Level specifies the minimum log level. Valid values are "trace",
+                      "debug", "info", "warn", and "error". By default, this value is "info".
+                    enum:
+                    - trace
+                    - debug
+                    - info
+                    - warn
+                    - error
+                    type: string
+                  maxDays:
+                    default: 3
+                    description: |-
+                      MaxDays specifies the maximum number of days to store log information
+                      before deletion.
+                    format: int64
+                    type: integer
+                  to:
+                    default: console
+                    description: |-
+                      This is destination where frp should write the logs.
+                      If "console" is used, logs will be printed to stdout, otherwise,
+                      logs will be written to the specified file.
+                      By default, this value is "console".
+                    type: string
+                type: object
+              maxPortsPerClient:
+                description: |-
+                  MaxPortsPerClient specifies the maximum number of ports a single client
+                  may proxy to. If this value is 0, no limit will be applied.
+                format: int64
+                type: integer
+              natholeAnalysisDataReserveHours:
+                default: 168
+                description: NatHoleAnalysisDataReserveHours specifies the hours to
+                  reserve nat hole analysis data.
+                format: int64
+                type: integer
+              proxyBindAddr:
+                description: |-
+                  ProxyBindAddr specifies the address that the proxy binds to. This value
+                  may be the same as BindAddr.
+                type: string
+              quicBindPort:
+                description: |-
+                  QUICBindPort specifies the QUIC port that the server listens on.
+                  Set this value to 0 will disable this feature.
+                type: integer
+              sshTunnelGateway:
+                description: SSHTunnelGateway specifies the SSH tunnel gateway configuration
+                properties:
+                  authorizedKeysFile:
+                    description: AuthorizedKeysFile specifies the path to the authorized
+                      keys file
+                    type: string
+                  autoGenPrivateKeyPath:
+                    default: ./.autogen_ssh_key
+                    description: AutoGenPrivateKeyPath specifies the path to auto
+                      generate private key
+                    type: string
+                  bindPort:
+                    description: BindPort specifies the port that the SSH tunnel gateway
+                      binds to
+                    type: integer
+                  privateKeyFile:
+                    description: PrivateKeyFile specifies the path to the private
+                      key file
+                    type: string
+                type: object
+              subDomainHost:
+                description: |-
+                  SubDomainHost specifies the domain that will be attached to sub-domains
+                  requested by the client when using Vhost proxying. For example, if this
+                  value is set to "frps.com" and the client requested the subdomain
+                  "test", the resulting URL would be "test.frps.com".
+                type: string
+              tcpmuxHTTPConnectPort:
+                description: |-
+                  TCPMuxHTTPConnectPort specifies the port that the server listens for TCP
+                  HTTP CONNECT requests. If the value is 0, the server will not multiplex TCP
+                  requests on one single port. If it's not - it will listen on this value for
+                  HTTP CONNECT requests.
+                type: integer
+              tcpmuxPassthrough:
+                description: If TCPMuxPassthrough is true, frps won't do any update
+                  on traffic.
+                type: boolean
+              transport:
+                description: Transport specifies the transport layer configuration
+                properties:
+                  heartbeatTimeout:
+                    default: 90
+                    description: |-
+                      HeartBeatTimeout specifies the maximum time to wait for a heartbeat
+                      before terminating the connection. It is not recommended to change this
+                      value. By default, this value is 90. Set negative value to disable it.
+                    format: int64
+                    type: integer
+                  maxPoolCount:
+                    default: 5
+                    description: |-
+                      MaxPoolCount specifies the maximum pool size for each proxy. By default,
+                      this value is 5.
+                    format: int64
+                    type: integer
+                  quic:
+                    description: QUIC options.
+                    properties:
+                      keepalivePeriod:
+                        default: 10
+                        description: KeepalivePeriod specifies the keepalive period
+                        type: integer
+                      maxIdleTimeout:
+                        default: 30
+                        description: MaxIdleTimeout specifies the maximum idle timeout
+                        type: integer
+                      maxIncomingStreams:
+                        default: 100000
+                        description: MaxIncomingStreams specifies the maximum incoming
+                          streams
+                        type: integer
+                    type: object
+                  tcpKeepAlive:
+                    default: 7200
+                    description: |-
+                      TCPKeepAlive specifies the interval between keep-alive probes for an active network connection between frpc and frps.
+                      If negative, keep-alive probes are disabled.
+                    format: int64
+                    type: integer
+                  tcpMux:
+                    default: true
+                    description: |-
+                      TCPMux toggles TCP stream multiplexing. This allows multiple requests
+                      from a client to share a single TCP connection. By default, this value
+                      is true.
+                    type: boolean
+                  tcpMuxKeepaliveInterval:
+                    default: 30
+                    description: |-
+                      TCPMuxKeepaliveInterval specifies the keep alive interval for TCP stream multiplier.
+                      If TCPMux is true, heartbeat of application layer is unnecessary because it can only rely on heartbeat in TCPMux.
+                    format: int64
+                    type: integer
+                  tls:
+                    description: TLS specifies TLS settings for the connection from
+                      the client.
+                    properties:
+                      certFile:
+                        description: CertFile specifies the path of the cert file
+                          that client will load.
+                        type: string
+                      force:
+                        description: Force specifies whether to only accept TLS-encrypted
+                          connections.
+                        type: boolean
+                      keyFile:
+                        description: KeyFile specifies the path of the secret key
+                          file that client will load.
+                        type: string
+                      serverName:
+                        description: |-
+                          ServerName specifies the custom server name of tls certificate. By
+                          default, server name if same to ServerAddr.
+                        type: string
+                      trustedCaFile:
+                        description: TrustedCaFile specifies the path of the trusted
+                          ca file that will load.
+                        type: string
+                    type: object
+                type: object
+              udpPacketSize:
+                default: 1500
+                description: |-
+                  UDPPacketSize specifies the UDP packet size
+                  By default, this value is 1500
+                format: int64
+                type: integer
+              userConnTimeout:
+                default: 10
+                description: |-
+                  UserConnTimeout specifies the maximum time to wait for a work
+                  connection. By default, this value is 10.
+                format: int64
+                type: integer
+              version:
+                description: Version specifies the API version
+                type: string
+              vhostHTTPPort:
+                description: |-
+                  VhostHTTPPort specifies the port that the server listens for HTTP Vhost
+                  requests. If this value is 0, the server will not listen for HTTP
+                  requests.
+                type: integer
+              vhostHTTPSPort:
+                description: |-
+                  VhostHTTPSPort specifies the port that the server listens for HTTPS
+                  Vhost requests. If this value is 0, the server will not listen for HTTPS
+                  requests.
+                type: integer
+              vhostHTTPTimeout:
+                default: 60
+                description: |-
+                  VhostHTTPTimeout specifies the response header timeout for the Vhost
+                  HTTP server, in seconds. By default, this value is 60.
+                format: int64
+                type: integer
+              webServer:
+                description: WebServer specifies the web server configuration
+                properties:
+                  addr:
+                    default: 127.0.0.1
+                    description: |-
+                      This is the network address to bind on for serving the web interface and API.
+                      By default, this value is "127.0.0.1".
+                    type: string
+                  assetsDir:
+                    description: |-
+                      AssetsDir specifies the local directory that the admin server will load
+                      resources from. If this value is "", assets will be loaded from the
+                      bundled executable using embed package.
+                    type: string
+                  password:
+                    description: Password specifies the password that the admin server
+                      will use for login.
+                    type: string
+                  port:
+                    description: |-
+                      Port specifies the port for the web server to listen on. If this
+                      value is 0, the admin server will not be started.
+                    type: integer
+                  pprofEnable:
+                    description: Enable golang pprof handlers.
+                    type: boolean
+                  tls:
+                    description: Enable TLS if TLSConfig is not nil.
+                    properties:
+                      certFile:
+                        description: CertFile specifies the path of the cert file
+                          that client will load.
+                        type: string
+                      keyFile:
+                        description: KeyFile specifies the path of the secret key
+                          file that client will load.
+                        type: string
+                      serverName:
+                        description: |-
+                          ServerName specifies the custom server name of tls certificate. By
+                          default, server name if same to ServerAddr.
+                        type: string
+                      trustedCaFile:
+                        description: TrustedCaFile specifies the path of the trusted
+                          ca file that will load.
+                        type: string
+                    type: object
+                  user:
+                    description: User specifies the username that the web server will
+                      use for login.
+                    type: string
+                type: object
+            required:
+            - version
+            type: object
+          status:
+            description: FRPServerStatus defines the observed state of FRPServer
+            properties:
+              activeConnections:
+                description: ActiveConnections contains the status of all active connections
+                items:
+                  description: ConnectionStatus defines the status of a single connection
+                  properties:
+                    bytesIn:
+                      description: BytesIn is the number of bytes received
+                      format: int64
+                      type: integer
+                    bytesOut:
+                      description: BytesOut is the number of bytes sent
+                      format: int64
+                      type: integer
+                    clientName:
+                      description: ClientName is the name of the client that established
+                        the connection
+                      type: string
+                    clientVersion:
+                      description: ClientVersion is the version of the client
+                      type: string
+                    currentConnections:
+                      description: CurrentConnections is the current number of connections
+                      format: int32
+                      type: integer
+                    lastCloseTime:
+                      description: LastCloseTime is when the connection was last closed
+                      format: date-time
+                      type: string
+                    lastHeartbeatTime:
+                      description: LastHeartbeatTime is the last time a heartbeat
+                        was received
+                      format: date-time
+                      type: string
+                    localAddr:
+                      description: LocalAddr is the local address of the connection
+                      type: string
+                    proxyConfig:
+                      description: ProxyConfig contains the proxy configuration
+                      properties:
+                        healthCheck:
+                          description: HealthCheck specifies the health check configuration
+                          properties:
+                            intervalSeconds:
+                              description: IntervalSeconds specifies the health check
+                                interval in seconds
+                              format: int32
+                              type: integer
+                            type:
+                              description: Type specifies the health check type
+                              type: string
+                          type: object
+                        loadBalancer:
+                          description: LoadBalancer specifies the load balancer configuration
+                          properties:
+                            group:
+                              description: Group specifies the load balancer group
+                              type: string
+                          type: object
+                        localIP:
+                          description: LocalIP specifies the local IP address
+                          type: string
+                        name:
+                          description: Name specifies the proxy name
+                          type: string
+                        remotePort:
+                          description: RemotePort specifies the remote port
+                          format: int32
+                          type: integer
+                        transport:
+                          description: Transport specifies the transport configuration
+                          properties:
+                            bandwidthLimit:
+                              description: BandwidthLimit specifies the bandwidth
+                                limit
+                              type: string
+                            bandwidthLimitMode:
+                              description: BandwidthLimitMode specifies the bandwidth
+                                limit mode
+                              type: string
+                          type: object
+                        type:
+                          description: Type specifies the proxy type
+                          type: string
+                      required:
+                      - name
+                      - type
+                      type: object
+                    proxyName:
+                      description: ProxyName is the name of the proxy that this connection
+                        belongs to
+                      type: string
+                    proxyType:
+                      description: ProxyType is the type of the proxy (tcp, udp, http,
+                        https, etc.)
+                      type: string
+                    remoteAddr:
+                      description: RemoteAddr is the remote address of the connection
+                      type: string
+                    startTime:
+                      description: StartTime is when the connection was established
+                      format: date-time
+                      type: string
+                    status:
+                      description: Status is the current status of the connection
+                      type: string
+                    todayTrafficIn:
+                      description: TodayTrafficIn is the number of bytes received
+                        today
+                      format: int64
+                      type: integer
+                    todayTrafficOut:
+                      description: TodayTrafficOut is the number of bytes sent today
+                      format: int64
+                      type: integer
+                    trafficStats:
+                      description: TrafficStats contains the traffic statistics
+                      properties:
+                        name:
+                          description: Name specifies the name of the entity
+                          type: string
+                        trafficIn:
+                          description: TrafficIn specifies the incoming traffic history
+                          items:
+                            format: int64
+                            type: integer
+                          type: array
+                        trafficOut:
+                          description: TrafficOut specifies the outgoing traffic history
+                          items:
+                            format: int64
+                            type: integer
+                          type: array
+                      required:
+                      - name
+                      - trafficIn
+                      - trafficOut
+                      type: object
+                  required:
+                  - bytesIn
+                  - bytesOut
+                  - clientName
+                  - clientVersion
+                  - currentConnections
+                  - lastHeartbeatTime
+                  - localAddr
+                  - proxyConfig
+                  - proxyName
+                  - proxyType
+                  - remoteAddr
+                  - startTime
+                  - status
+                  - todayTrafficIn
+                  - todayTrafficOut
+                  type: object
+                type: array
+              conditions:
+                description: Conditions represents the latest available observations
+                  of an object's current state
+                items:
+                  description: "Condition contains details for one aspect of the current
+                    state of this API Resource.\n---\nThis struct is intended for
+                    direct use as an array at the field path .status.conditions.  For
+                    example,\n\n\n\ttype FooStatus struct{\n\t    // Represents the
+                    observations of a foo's current state.\n\t    // Known .status.conditions.type
+                    are: \"Available\", \"Progressing\", and \"Degraded\"\n\t    //
+                    +patchMergeKey=type\n\t    // +patchStrategy=merge\n\t    // +listType=map\n\t
+                    \   // +listMapKey=type\n\t    Conditions []metav1.Condition `json:\"conditions,omitempty\"
+                    patchStrategy:\"merge\" patchMergeKey:\"type\" protobuf:\"bytes,1,rep,name=conditions\"`\n\n\n\t
+                    \   // other fields\n\t}"
+                  properties:
+                    lastTransitionTime:
+                      description: |-
+                        lastTransitionTime is the last time the condition transitioned from one status to another.
+                        This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+                      format: date-time
+                      type: string
+                    message:
+                      description: |-
+                        message is a human readable message indicating details about the transition.
+                        This may be an empty string.
+                      maxLength: 32768
+                      type: string
+                    observedGeneration:
+                      description: |-
+                        observedGeneration represents the .metadata.generation that the condition was set based upon.
+                        For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+                        with respect to the current state of the instance.
+                      format: int64
+                      minimum: 0
+                      type: integer
+                    reason:
+                      description: |-
+                        reason contains a programmatic identifier indicating the reason for the condition's last transition.
+                        Producers of specific condition types may define expected values and meanings for this field,
+                        and whether the values are considered a guaranteed API.
+                        The value should be a CamelCase string.
+                        This field may not be empty.
+                      maxLength: 1024
+                      minLength: 1
+                      pattern: ^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$
+                      type: string
+                    status:
+                      description: status of the condition, one of True, False, Unknown.
+                      enum:
+                      - "True"
+                      - "False"
+                      - Unknown
+                      type: string
+                    type:
+                      description: |-
+                        type of condition in CamelCase or in foo.example.com/CamelCase.
+                        ---
+                        Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
+                        useful (see .node.status.conditions), the ability to deconflict is important.
+                        The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+                      maxLength: 316
+                      pattern: ^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$
+                      type: string
+                  required:
+                  - lastTransitionTime
+                  - message
+                  - reason
+                  - status
+                  - type
+                  type: object
+                type: array
+              observedGeneration:
+                description: ObservedGeneration is the most recent generation observed
+                  by the controller
+                format: int64
+                type: integer
+              ready:
+                description: Ready indicates whether the FRPServer is ready to serve
+                  requests
+                type: boolean
+              serviceStatus:
+                description: ServiceStatus contains the overall status of the FRP
+                  service
+                properties:
+                  lastUpdateTime:
+                    description: LastUpdateTime is when the status was last updated
+                    format: date-time
+                    type: string
+                  totalBytesIn:
+                    description: TotalBytesIn is the total number of bytes received
+                    format: int64
+                    type: integer
+                  totalBytesOut:
+                    description: TotalBytesOut is the total number of bytes sent
+                    format: int64
+                    type: integer
+                  totalClients:
+                    description: TotalClients is the total number of connected clients
+                    format: int32
+                    type: integer
+                  totalConnections:
+                    description: TotalConnections is the total number of active connections
+                    format: int32
+                    type: integer
+                  totalProxies:
+                    description: TotalProxies is the total number of configured proxies
+                    format: int32
+                    type: integer
+                  uptime:
+                    description: Uptime is the duration since the service started
+                    type: string
+                required:
+                - lastUpdateTime
+                - totalBytesIn
+                - totalBytesOut
+                - totalClients
+                - totalConnections
+                - totalProxies
+                - uptime
+                type: object
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
