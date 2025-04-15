@@ -4,77 +4,121 @@ import (
 	"context"
 	"fmt"
 	"sync"
+
+	v1alpha1 "github.com/fatedier/frp/api/v1alpha1"
+	config "github.com/fatedier/frp/pkg/config/v1"
+	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
 // Manager handles the Kubernetes integration for the frp server
 type Manager struct {
-	client     Client
+	client     client.Client
 	serverName string
 	namespace  string
 	mu         sync.RWMutex
-	server     *FrpServer
+	server     *config.ServerConfig
 }
 
 // NewManager creates a new Kubernetes manager
-func NewManager(client Client, serverName, namespace string) *Manager {
-	return &Manager{
+func NewManager(client client.Client, serverName, namespace string) (*Manager, error) {
+	frpServer, err := LoadServerConfig(context.Background(), client, serverName, namespace)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load server config: %v", err)
+	}
+	manager := &Manager{
 		client:     client,
 		serverName: serverName,
 		namespace:  namespace,
+		server:     frpServer,
 	}
+	return manager, nil
 }
 
-// Start begins watching the FrpServer resource
-func (m *Manager) Start(ctx context.Context) error {
-	// Initial fetch of the FrpServer resource
-	server, err := m.client.GetFrpServer(ctx, m.serverName)
+func (m *Manager) GetFrpServer(ctx context.Context) (*v1alpha1.FRPServer, error) {
+	frpServer := &v1alpha1.FRPServer{}
+	err := m.client.Get(ctx, client.ObjectKey{Namespace: m.namespace, Name: m.serverName}, frpServer)
 	if err != nil {
-		return fmt.Errorf("failed to get FrpServer: %v", err)
+		return nil, fmt.Errorf("failed to get FrpServer: %v", err)
 	}
-
-	m.mu.Lock()
-	m.server = server
-	m.mu.Unlock()
-
-	// TODO: Implement watch using dynamic client or code-generator
-	return nil
+	return frpServer, nil
 }
 
 // GetConfig returns the current FrpServer configuration
-func (m *Manager) GetConfig() (*FrpServer, error) {
+func (m *Manager) GetConfig(ctx context.Context) (*config.ServerConfig, error) {
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 	return m.server, nil
 }
 
-// UpdateClientConnection updates the status with a new client connection
-func (m *Manager) UpdateClientConnection(ctx context.Context, conn ClientConnection) error {
+// // UpdateClientConnection updates the status with a new client connection
+// func (m *Manager) UpdateClientConnection(ctx context.Context, newConn v1alpha1.ConnectionStatus) error {
+// 	m.mu.Lock()
+// 	defer m.mu.Unlock()
+
+// 	server, err := m.GetFrpServer(ctx)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to get FrpServer: %v", err)
+// 	}
+
+// 	// Add the new connection to the status
+// 	isExist := false
+// 	for i, conn := range server.Status.ActiveConnections {
+// 		if conn.ProxyName == newConn.ProxyName {
+// 			isExist = true
+// 			server.Status.ActiveConnections[i].ProxyType = newConn.ProxyType
+// 			server.Status.ActiveConnections[i].RemoteAddr = newConn.RemoteAddr
+// 			server.Status.ActiveConnections[i].ClientName = newConn.ClientName
+// 			server.Status.ActiveConnections[i].LastHeartbeatTime = metav1.NewTime(time.Now())
+// 		}
+// 	}
+// 	if !isExist {
+// 		newConn.LastHeartbeatTime = metav1.NewTime(time.Now())
+// 		newConn.StartTime = metav1.NewTime(time.Now())
+// 		server.Status.ActiveConnections = append(server.Status.ActiveConnections, newConn)
+// 	}
+
+// 	// Update the status in Kubernetes
+// 	return m.client.Status().Update(ctx, server)
+// }
+
+// // RemoveClientConnection removes a client connection from the status
+// func (m *Manager) RemoveClientConnection(ctx context.Context, clientID string) error {
+// 	m.mu.Lock()
+// 	defer m.mu.Unlock()
+
+// 	server, err := m.GetFrpServer(ctx)
+// 	if err != nil {
+// 		return fmt.Errorf("failed to get FrpServer: %v", err)
+// 	}
+
+// 	// Find and remove the connection
+// 	for i, conn := range server.Status.ActiveConnections {
+// 		if conn.ClientName == clientID {
+// 			server.Status.ActiveConnections = append(
+// 				server.Status.ActiveConnections[:i],
+// 				server.Status.ActiveConnections[i+1:]...,
+// 			)
+// 			break
+// 		}
+// 	}
+
+// 	// Update the status in Kubernetes
+// 	return m.client.Status().Update(ctx, server)
+// }
+
+func (m *Manager) UpdateProxyStats(ctx context.Context, connectionStatus []*v1alpha1.ConnectionStatus) error {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	// Add the new connection to the status
-	m.server.Status.ClientConnections = append(m.server.Status.ClientConnections, conn)
-
-	// Update the status in Kubernetes
-	return m.client.UpdateFrpServerStatus(ctx, m.server)
-}
-
-// RemoveClientConnection removes a client connection from the status
-func (m *Manager) RemoveClientConnection(ctx context.Context, clientID string) error {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
-	// Find and remove the connection
-	for i, conn := range m.server.Status.ClientConnections {
-		if conn.ClientID == clientID {
-			m.server.Status.ClientConnections = append(
-				m.server.Status.ClientConnections[:i],
-				m.server.Status.ClientConnections[i+1:]...,
-			)
-			break
-		}
+	server, err := m.GetFrpServer(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to get FrpServer: %v", err)
 	}
 
+	// Find and remove the connection
+	server.Status.ActiveConnections = connectionStatus
+
 	// Update the status in Kubernetes
-	return m.client.UpdateFrpServerStatus(ctx, m.server)
+	return m.client.Status().Update(ctx, server)
+
 }

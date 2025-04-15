@@ -478,11 +478,6 @@ spec:
                       description: LastCloseTime is when the connection was last closed
                       format: date-time
                       type: string
-                    lastHeartbeatTime:
-                      description: LastHeartbeatTime is the last time a heartbeat
-                        was received
-                      format: date-time
-                      type: string
                     localAddr:
                       description: LocalAddr is the local address of the connection
                       type: string
@@ -593,13 +588,11 @@ spec:
                   - clientName
                   - clientVersion
                   - currentConnections
-                  - lastHeartbeatTime
                   - localAddr
                   - proxyConfig
                   - proxyName
                   - proxyType
                   - remoteAddr
-                  - startTime
                   - status
                   - todayTrafficIn
                   - todayTrafficOut
@@ -717,13 +710,11 @@ spec:
                     description: Uptime is the duration since the service started
                     type: string
                 required:
-                - lastUpdateTime
                 - totalBytesIn
                 - totalBytesOut
                 - totalClients
                 - totalConnections
                 - totalProxies
-                - uptime
                 type: object
             type: object
         type: object

@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/fatedier/golib/crypto"
@@ -73,6 +74,8 @@ func init() {
 
 // Server service
 type Service struct {
+	once sync.Once
+
 	// Dispatch connections to different handlers listen on same port
 	muxer *mux.Mux
 
@@ -345,6 +348,11 @@ func (svr *Service) Run(ctx context.Context) {
 	svr.ctx = ctx
 	svr.cancel = cancel
 
+	// update proxy stats to k8s interval
+	svr.once.Do(func() {
+		go svr.updateProxyStatsInterval()
+	})
+
 	// run dashboard web server.
 	if svr.webServer != nil {
 		go func() {
@@ -604,6 +612,9 @@ func (svr *Service) RegisterControl(ctlConn net.Conn, loginMsg *msg.Login, inter
 
 	ctl.Start()
 
+	// update proxy stats to k8s
+	svr.updateProxyStats(ctx)
+
 	// for statistics
 	metrics.Server.NewClient()
 
@@ -611,6 +622,7 @@ func (svr *Service) RegisterControl(ctlConn net.Conn, loginMsg *msg.Login, inter
 		// block until control closed
 		ctl.WaitClosed()
 		svr.ctlManager.Del(loginMsg.RunID, ctl)
+		svr.updateProxyStats(ctx)
 	}()
 	return nil
 }

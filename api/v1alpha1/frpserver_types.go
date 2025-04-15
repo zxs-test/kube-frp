@@ -114,10 +114,8 @@ type ConnectionStatus struct {
 	RemoteAddr string `json:"remoteAddr"`
 
 	// StartTime is when the connection was established
+	// +optional
 	StartTime metav1.Time `json:"startTime"`
-
-	// LastHeartbeatTime is the last time a heartbeat was received
-	LastHeartbeatTime metav1.Time `json:"lastHeartbeatTime"`
 
 	// LastCloseTime is when the connection was last closed
 	// +optional
@@ -172,9 +170,11 @@ type ServiceStatus struct {
 	TotalBytesOut int64 `json:"totalBytesOut"`
 
 	// Uptime is the duration since the service started
+	// +optional
 	Uptime metav1.Duration `json:"uptime"`
 
 	// LastUpdateTime is when the status was last updated
+	// +optional
 	LastUpdateTime metav1.Time `json:"lastUpdateTime"`
 }
 
@@ -198,7 +198,7 @@ type FRPServerStatus struct {
 
 	// ActiveConnections contains the status of all active connections
 	// +optional
-	ActiveConnections []ConnectionStatus `json:"activeConnections,omitempty"`
+	ActiveConnections []*ConnectionStatus `json:"activeConnections,omitempty"`
 }
 
 // +kubebuilder:object:root=true

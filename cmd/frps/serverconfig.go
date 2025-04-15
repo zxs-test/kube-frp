@@ -36,8 +36,8 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&kubeconfig, "kubeconfig", "", "Path to the kubeconfig file")
 }
 
-// loadCRConfig loads configuration from FRPServer CR
-func loadCRConfig(frpServerName string, frpServerNamespace string, kubeconfig string) (*v1.ServerConfig, error) {
+// InitManagerAndLoadConfig loads configuration from FRPServer CR
+func InitManagerAndLoadConfig(frpServerName string, frpServerNamespace string, kubeconfig string) (*v1.ServerConfig, error) {
 	if kubeconfig == "" {
 		kubeconfig = os.Getenv("KUBECONFIG")
 		if kubeconfig == "" {
@@ -49,12 +49,17 @@ func loadCRConfig(frpServerName string, frpServerNamespace string, kubeconfig st
 		}
 	}
 
-	k8sClient, err := k8s.NewClient(kubeconfig)
+	client, err := k8s.NewClient(kubeconfig)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create Kubernetes client: %v", err)
 	}
 
-	svrCfg, err := k8sClient.LoadServerConfig(context.Background(), frpServerName, frpServerNamespace)
+	err = k8s.Init(client, frpServerName, frpServerNamespace)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize frp server client: %v", err)
+	}
+
+	svrCfg, err := k8s.GetConfig(context.Background())
 	if err != nil {
 		return nil, fmt.Errorf("failed to load configuration from FRPServer CR: %v", err)
 	}

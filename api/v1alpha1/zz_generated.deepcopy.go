@@ -81,7 +81,6 @@ func (in *ConnectionStatus) DeepCopyInto(out *ConnectionStatus) {
 	*out = *in
 	in.ProxyConfig.DeepCopyInto(&out.ProxyConfig)
 	in.StartTime.DeepCopyInto(&out.StartTime)
-	in.LastHeartbeatTime.DeepCopyInto(&out.LastHeartbeatTime)
 	in.LastCloseTime.DeepCopyInto(&out.LastCloseTime)
 	if in.TrafficStats != nil {
 		in, out := &in.TrafficStats, &out.TrafficStats
@@ -210,9 +209,13 @@ func (in *FRPServerStatus) DeepCopyInto(out *FRPServerStatus) {
 	in.ServiceStatus.DeepCopyInto(&out.ServiceStatus)
 	if in.ActiveConnections != nil {
 		in, out := &in.ActiveConnections, &out.ActiveConnections
-		*out = make([]ConnectionStatus, len(*in))
+		*out = make([]*ConnectionStatus, len(*in))
 		for i := range *in {
-			(*in)[i].DeepCopyInto(&(*out)[i])
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(ConnectionStatus)
+				(*in).DeepCopyInto(*out)
+			}
 		}
 	}
 }

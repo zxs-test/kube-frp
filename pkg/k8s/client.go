@@ -4,11 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fatedier/frp/api/v1alpha1"
 	frpv1alpha1 "github.com/fatedier/frp/api/v1alpha1"
-	config "github.com/fatedier/frp/pkg/config/v1"
-
 	configtypes "github.com/fatedier/frp/pkg/config/types"
+	config "github.com/fatedier/frp/pkg/config/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
@@ -22,13 +20,8 @@ const (
 	Version = "v1alpha1"
 )
 
-// Client is a wrapper around the Kubernetes client
-type Client struct {
-	client.Client
-}
-
 // NewClient creates a new Kubernetes client
-func NewClient(kubeconfig string) (*Client, error) {
+func NewClient(kubeconfig string) (client.Client, error) {
 	var config *rest.Config
 	var err error
 
@@ -51,22 +44,13 @@ func NewClient(kubeconfig string) (*Client, error) {
 		return nil, fmt.Errorf("failed to create client: %v", err)
 	}
 
-	return &Client{cl}, nil
-}
-
-// GetFRPServer retrieves a FRPServer CR by name and namespace
-func (c *Client) GetFRPServer(ctx context.Context, name, namespace string) (*frpv1alpha1.FRPServer, error) {
-	frpServer := &frpv1alpha1.FRPServer{}
-	err := c.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, frpServer)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get FRPServer: %v", err)
-	}
-	return frpServer, nil
+	return cl, nil
 }
 
 // LoadServerConfig loads the server configuration from a FRPServer CR
-func (c *Client) LoadServerConfig(ctx context.Context, name, namespace string) (*config.ServerConfig, error) {
-	frpServer, err := c.GetFRPServer(ctx, name, namespace)
+func LoadServerConfig(ctx context.Context, c client.Client, name, namespace string) (*config.ServerConfig, error) {
+	frpServer := &frpv1alpha1.FRPServer{}
+	err := c.Get(ctx, client.ObjectKey{Namespace: namespace, Name: name}, frpServer)
 	if err != nil {
 		return nil, fmt.Errorf("failed to load FRPServer CR: %v", err)
 	}
@@ -89,6 +73,12 @@ func (c *Client) LoadServerConfig(ctx context.Context, name, namespace string) (
 		AllowPorts:            parsePortsRange(frpServer.Spec.AllowPorts),
 		EnablePrometheus:      frpServer.Spec.EnablePrometheus,
 		UserConnTimeout:       int64(frpServer.Spec.UserConnTimeout),
+		WebServer: config.WebServerConfig{
+			Addr:     frpServer.Spec.WebServer.Addr,
+			Port:     frpServer.Spec.WebServer.Port,
+			User:     frpServer.Spec.WebServer.User,
+			Password: frpServer.Spec.WebServer.Password,
+		},
 	}
 
 	if frpServer.Spec.Transport.TLS.Force {
@@ -105,21 +95,16 @@ func (c *Client) LoadServerConfig(ctx context.Context, name, namespace string) (
 	return conf, nil
 }
 
-// parsePortsRange parses a string of ports range into a slice of PortsRange
-func parsePortsRange(ports []v1alpha1.PortsRange) []configtypes.PortsRange {
+func parsePortsRange(ports []frpv1alpha1.PortsRange) []configtypes.PortsRange {
 	if ports == nil {
 		return nil
 	}
-	// TODO: Implement ports range parsing
-	return nil
-}
-
-func (c *Client) GetFrpServer(ctx context.Context, name string) (*FrpServer, error) {
-	// TODO: Implement using dynamic client or code-generator
-	return nil, fmt.Errorf("not implemented")
-}
-
-func (c *Client) UpdateFrpServerStatus(ctx context.Context, server *FrpServer) error {
-	// TODO: Implement using dynamic client or code-generator
-	return fmt.Errorf("not implemented")
+	confPorts := make([]configtypes.PortsRange, len(ports))
+	for i, port := range ports {
+		confPorts[i] = configtypes.PortsRange{
+			Start: int(port.Start),
+			End:   int(port.End),
+		}
+	}
+	return confPorts
 }

@@ -24,6 +24,9 @@ import (
 type ServerConfig struct {
 	APIMetadata
 
+	// EnableOperator specifies whether to enable the operator for k8s.
+	EnableOperator bool `json:"enableOperator,omitempty"`
+
 	Auth AuthServerConfig `json:"auth,omitempty"`
 	// BindAddr specifies the address that the server binds to. By default,
 	// this value is "0.0.0.0".

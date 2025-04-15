@@ -61,7 +61,11 @@ var rootCmd = &cobra.Command{
 		)
 
 		if frpServerName != "" {
-			svrCfg, err = loadCRConfig(frpServerName, frpServerNamespace, kubeconfig)
+			svrCfg, err = InitManagerAndLoadConfig(frpServerName, frpServerNamespace, kubeconfig)
+			if err != nil {
+				return err
+			}
+			svrCfg.EnableOperator = true
 		} else if cfgFile != "" {
 			svrCfg, isLegacyFormat, err = config.LoadServerConfig(cfgFile, strictConfigMode)
 			if err != nil {
