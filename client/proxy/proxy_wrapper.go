@@ -25,12 +25,12 @@ import (
 
 	"github.com/fatedier/golib/errors"
 
-	"github.com/fatedier/frp/client/event"
-	"github.com/fatedier/frp/client/health"
-	v1 "github.com/fatedier/frp/pkg/config/v1"
-	"github.com/fatedier/frp/pkg/msg"
-	"github.com/fatedier/frp/pkg/transport"
-	"github.com/fatedier/frp/pkg/util/xlog"
+	"github.com/imneov/kube-frp/client/event"
+	"github.com/imneov/kube-frp/client/health"
+	v1 "github.com/imneov/kube-frp/pkg/config/v1"
+	"github.com/imneov/kube-frp/pkg/msg"
+	"github.com/imneov/kube-frp/pkg/transport"
+	"github.com/imneov/kube-frp/pkg/util/xlog"
 )
 
 const (

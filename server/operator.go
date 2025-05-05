@@ -20,11 +20,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/fatedier/frp/api/v1alpha1"
-	configv1 "github.com/fatedier/frp/pkg/config/v1"
-	"github.com/fatedier/frp/pkg/k8s"
-	"github.com/fatedier/frp/pkg/metrics/mem"
-	"github.com/fatedier/frp/pkg/util/log"
+	"github.com/imneov/kube-frp/api/v1alpha1"
+	configv1 "github.com/imneov/kube-frp/pkg/config/v1"
+	"github.com/imneov/kube-frp/pkg/k8s"
+	"github.com/imneov/kube-frp/pkg/metrics/mem"
+	"github.com/imneov/kube-frp/pkg/util/log"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

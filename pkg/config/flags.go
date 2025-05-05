@@ -22,9 +22,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
-	"github.com/fatedier/frp/pkg/config/types"
-	v1 "github.com/fatedier/frp/pkg/config/v1"
-	"github.com/fatedier/frp/pkg/config/v1/validation"
+	"github.com/imneov/kube-frp/pkg/config/types"
+	v1 "github.com/imneov/kube-frp/pkg/config/v1"
+	"github.com/imneov/kube-frp/pkg/config/v1/validation"
 )
 
 // WordSepNormalizeFunc changes all flags that contain "_" separators
@@ -145,6 +145,8 @@ func registerVisitorBaseConfigFlags(cmd *cobra.Command, c *v1.VisitorBaseConfig,
 	cmd.Flags().StringVarP(&c.ServerUser, "server-user", "", "", "server user")
 	cmd.Flags().StringVarP(&c.BindAddr, "bind_addr", "", "", "bind addr")
 	cmd.Flags().IntVarP(&c.BindPort, "bind_port", "", 0, "bind port")
+	cmd.Flags().StringVarP(&c.IPRange, "ip_range", "", "", "IP range to automatically assign IP addresses from (e.g., 172.1.1.0/24)")
+	cmd.Flags().BoolVarP(&c.AutoAssignPort, "auto_assign_port", "", false, "automatically assign a port")
 }
 
 func RegisterClientCommonConfigFlags(cmd *cobra.Command, c *v1.ClientCommonConfig, opts ...RegisterFlagOption) {

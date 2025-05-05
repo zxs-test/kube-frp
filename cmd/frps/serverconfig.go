@@ -20,8 +20,8 @@ import (
 	"os"
 	"path/filepath"
 
-	v1 "github.com/fatedier/frp/pkg/config/v1"
-	"github.com/fatedier/frp/pkg/k8s"
+	v1 "github.com/imneov/kube-frp/pkg/config/v1"
+	"github.com/imneov/kube-frp/pkg/k8s"
 	"github.com/spf13/pflag"
 )
 

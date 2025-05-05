@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	frpv1alpha1 "github.com/fatedier/frp/api/v1alpha1"
-	configtypes "github.com/fatedier/frp/pkg/config/types"
-	config "github.com/fatedier/frp/pkg/config/v1"
+	frpv1alpha1 "github.com/imneov/kube-frp/api/v1alpha1"
+	configtypes "github.com/imneov/kube-frp/pkg/config/types"
+	config "github.com/imneov/kube-frp/pkg/config/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"

@@ -1,4 +1,4 @@
-module github.com/fatedier/frp
+module github.com/imneov/kube-frp
 
 go 1.23.0
 

@@ -18,7 +18,7 @@ import (
 	"cmp"
 	"slices"
 
-	"github.com/fatedier/frp/pkg/util/log"
+	"github.com/imneov/kube-frp/pkg/util/log"
 )
 
 type LogPrefix struct {

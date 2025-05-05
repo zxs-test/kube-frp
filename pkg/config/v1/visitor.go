@@ -23,7 +23,7 @@ import (
 
 	"github.com/samber/lo"
 
-	"github.com/fatedier/frp/pkg/util/util"
+	"github.com/imneov/kube-frp/pkg/util/util"
 )
 
 type VisitorTransport struct {
@@ -44,6 +44,10 @@ type VisitorBaseConfig struct {
 	// It can be less than 0, it means don't bind to the port and only receive connections redirected from
 	// other visitors. (This is not supported for SUDP now)
 	BindPort int `json:"bindPort,omitempty"`
+	// IPRange specifies the IP range to automatically assign IP addresses from
+	IPRange string `json:"ipRange,omitempty"`
+	// AutoAssignPort specifies whether to automatically assign a port
+	AutoAssignPort bool `json:"autoAssignPort,omitempty"`
 }
 
 func (c *VisitorBaseConfig) GetBaseConfig() *VisitorBaseConfig {

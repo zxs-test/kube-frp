@@ -19,8 +19,8 @@ import (
 	"reflect"
 	"sync"
 
-	v1 "github.com/fatedier/frp/pkg/config/v1"
-	"github.com/fatedier/frp/pkg/msg"
+	v1 "github.com/imneov/kube-frp/pkg/config/v1"
+	"github.com/imneov/kube-frp/pkg/msg"
 )
 
 func init() {

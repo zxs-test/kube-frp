@@ -15,7 +15,7 @@
 package metrics
 
 import (
-	"github.com/fatedier/frp/pkg/metrics/aggregate"
+	"github.com/imneov/kube-frp/pkg/metrics/aggregate"
 )
 
 var (

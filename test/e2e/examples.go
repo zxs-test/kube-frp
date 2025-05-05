@@ -5,8 +5,8 @@ import (
 
 	"github.com/onsi/ginkgo/v2"
 
-	"github.com/fatedier/frp/test/e2e/framework"
-	"github.com/fatedier/frp/test/e2e/framework/consts"
+	"github.com/imneov/kube-frp/test/e2e/framework"
+	"github.com/imneov/kube-frp/test/e2e/framework/consts"
 )
 
 var _ = ginkgo.Describe("[Feature: Example]", func() {

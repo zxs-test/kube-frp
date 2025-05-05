@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"sync"
 
-	v1alpha1 "github.com/fatedier/frp/api/v1alpha1"
-	config "github.com/fatedier/frp/pkg/config/v1"
+	v1alpha1 "github.com/imneov/kube-frp/api/v1alpha1"
+	config "github.com/imneov/kube-frp/pkg/config/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )

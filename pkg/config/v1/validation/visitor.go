@@ -17,9 +17,10 @@ package validation
 import (
 	"errors"
 	"fmt"
+	"net"
 	"slices"
 
-	v1 "github.com/fatedier/frp/pkg/config/v1"
+	v1 "github.com/imneov/kube-frp/pkg/config/v1"
 )
 
 func ValidateVisitorConfigurer(c v1.VisitorConfigurer) error {
@@ -48,9 +49,18 @@ func validateVisitorBaseConfig(c *v1.VisitorBaseConfig) error {
 		return errors.New("server name is required")
 	}
 
-	if c.BindPort == 0 {
-		return errors.New("bind port is required")
+	if c.BindPort == 0 && !c.AutoAssignPort {
+		return errors.New("bind port is required when auto assign port is disabled")
 	}
+
+	if c.IPRange != "" {
+		// Validate IP range format (e.g., "172.1.1.0/24")
+		_, _, err := net.ParseCIDR(c.IPRange)
+		if err != nil {
+			return fmt.Errorf("invalid IP range format: %v", err)
+		}
+	}
+
 	return nil
 }
 

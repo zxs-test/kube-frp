@@ -20,15 +20,15 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/fatedier/frp/client/proxy"
-	"github.com/fatedier/frp/client/visitor"
-	"github.com/fatedier/frp/pkg/auth"
-	v1 "github.com/fatedier/frp/pkg/config/v1"
-	"github.com/fatedier/frp/pkg/msg"
-	"github.com/fatedier/frp/pkg/transport"
-	netpkg "github.com/fatedier/frp/pkg/util/net"
-	"github.com/fatedier/frp/pkg/util/wait"
-	"github.com/fatedier/frp/pkg/util/xlog"
+	"github.com/imneov/kube-frp/client/proxy"
+	"github.com/imneov/kube-frp/client/visitor"
+	"github.com/imneov/kube-frp/pkg/auth"
+	v1 "github.com/imneov/kube-frp/pkg/config/v1"
+	"github.com/imneov/kube-frp/pkg/msg"
+	"github.com/imneov/kube-frp/pkg/transport"
+	netpkg "github.com/imneov/kube-frp/pkg/util/net"
+	"github.com/imneov/kube-frp/pkg/util/wait"
+	"github.com/imneov/kube-frp/pkg/util/xlog"
 )
 
 type SessionContext struct {

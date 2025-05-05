@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	v1alpha1 "github.com/fatedier/frp/api/v1alpha1"
-	config "github.com/fatedier/frp/pkg/config/v1"
+	v1alpha1 "github.com/imneov/kube-frp/api/v1alpha1"
+	config "github.com/imneov/kube-frp/pkg/config/v1"
 	"k8s.io/klog/v2"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
