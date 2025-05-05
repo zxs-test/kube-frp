@@ -231,7 +231,88 @@ spec:
 kubectl get frpconnections -n frp
 ```
 
-## 为 frp 做贡献
+### 服务名
+
+以下是为你的 FRP 注册服务名格式提供的 `README.md` 示例文档，适用于项目中的说明用途：
+
+---
+
+#### FRP 服务注册名称规范
+
+本项目中，我们通过自定义格式构造 FRP 服务名称，用于在 Kubernetes 环境中注册 Pod 或 Service 的网络访问信息，并携带丰富的上下文信息，供控制器和其他组件解析与使用。
+
+---
+
+##### ✅ 命名格式
+
+```text
+[protocol]://[name].[namespace].[cluster]:[port]/[type]/[ip]?key=value&...
+```
+
+###### 字段说明：
+
+| 字段名          | 示例值           | 描述                      |
+| ------------ | ------------- | ----------------------- |
+| `protocol`   | `tcp` / `udp` | 使用的网络协议                 |
+| `name`       | `nginx`       | Pod 或 Service 名称        |
+| `namespace`  | `default`     | Kubernetes 命名空间         |
+| `cluster`    | `cluster1`    | 集群标识（支持多集群场景）           |
+| `port`       | `8080`        | 对应服务端口（支持添加端口名后缀）       |
+| `type`       | `pod` / `svc` | 资源类型：Pod 或 Service      |
+| `ip`（可选）     | `10.42.1.5`   | Pod 的 IP，仅 `pod` 类型时可使用 |
+| Query 参数（可选） | `node=node1`  | 附加信息，如节点、环境、可用区等        |
+
+---
+
+##### ✅ 示例
+
+###### 注册一个 Pod 的 TCP 服务：
+
+```
+tcp://nginx.default.cluster1:8080/pod/10.42.1.5?node=node1
+```
+
+###### 注册一个带命名端口的 Service：
+
+```
+tcp://api-gw.default.cluster1:443-https/svc
+```
+
+### 注册一个 UDP Service，指定 zone：
+
+```
+udp://dns.kube-system.cluster1:53/svc?zone=cn-hz-a
+```
+
+---
+
+##### ✅ 设计原则
+
+* **可读性强**：结构清晰，便于人和程序理解。
+* **唯一性强**：包含 cluster、namespace、端口等信息，避免冲突。
+* **可扩展性强**：通过 Query 支持附加任意键值元信息。
+* **解析简单**：兼容标准 URI 结构，易于正则或 URL parser 反解。
+
+---
+
+##### ✅ 使用建议
+
+* 服务名称应由控制器或注册器统一生成，避免手动拼接。
+* 如需解析，请使用标准 URI 工具库解析协议头、主机、路径、查询参数。
+* 建议使用结构体封装服务名信息，便于逻辑处理和验证。
+
+---
+
+如需 `Go` 版本的 `ServiceNameBuilder` 工具或解析器，请参考 `pkg/frpname` 目录。
+
+---
+
+是否需要我帮你生成这部分的 Go 结构体和构造函数？
+
+
+
+
+##### 为 frp 做贡献
 
 frp 是一个免费且开源的项目，我们欢迎任何人为其开发和进步贡献力量。
 
