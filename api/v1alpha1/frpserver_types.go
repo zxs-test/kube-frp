@@ -73,9 +73,21 @@ type ProxyConfig struct {
 	// +optional
 	LocalIP string `json:"localIP,omitempty"`
 
+	// LocalPort specifies the local port
+	// +optional
+	LocalPort int32 `json:"localPort,omitempty"`
+
 	// RemotePort specifies the remote port
 	// +optional
 	RemotePort int32 `json:"remotePort,omitempty"`
+
+	// SecretKey specifies the secret key
+	// +optional
+	SecretKey string `json:"secretKey,omitempty"`
+
+	// AllowUsers specifies the allowed users
+	// +optional
+	AllowUsers []string `json:"allowUsers,omitempty"`
 }
 
 // TrafficStats defines the traffic statistics

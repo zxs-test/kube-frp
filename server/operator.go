@@ -96,6 +96,7 @@ func (svr *Service) updateProxyStats(ctx context.Context) {
 						Name:       cfg.Name,
 						Type:       cfg.Type,
 						LocalIP:    cfg.LocalIP,
+						LocalPort:  int32(cfg.LocalPort),
 						RemotePort: int32(cfg.RemotePort),
 					}
 
@@ -119,6 +120,7 @@ func (svr *Service) updateProxyStats(ctx context.Context) {
 						Name:       cfg.Name,
 						Type:       cfg.Type,
 						LocalIP:    cfg.LocalIP,
+						LocalPort:  int32(cfg.LocalPort),
 						RemotePort: int32(cfg.RemotePort),
 					}
 
@@ -136,10 +138,57 @@ func (svr *Service) updateProxyStats(ctx context.Context) {
 						IntervalSeconds: int32(cfg.HealthCheck.IntervalSeconds),
 					}
 					proxyInfo.ProxyType = "udp"
-				// case *configv1.STCPProxyConfig:
-				// 	proxyInfo.ProxyType = "stcp"
-				// case *configv1.SUDPProxyConfig:
-				// 	proxyInfo.ProxyType = "sudp"
+				case *configv1.STCPProxyConfig:
+					//{"name":"udp://svc.ns.cluster:7000/pod/10.0.0.1/meta/a=1","type":"stcp","transport":{"bandwidthLimit":"","bandwidthLimitMode":"client"},"loadBalancer":{"group":""},"healthCheck":{"type":"","intervalSeconds":0},"localIP":"127.0.0.1","plugin":null,"secretKey":"abc001"}
+					proxyInfo.ProxyConfig = v1alpha1.ProxyConfig{
+						Name:       cfg.Name,
+						Type:       cfg.Type,
+						LocalIP:    cfg.LocalIP,
+						LocalPort:  int32(cfg.LocalPort),
+						SecretKey:  cfg.Secretkey,
+						AllowUsers: cfg.AllowUsers,
+					}
+
+					proxyInfo.ProxyConfig.Transport = &v1alpha1.TransportConfig{
+						BandwidthLimit:     cfg.Transport.BandwidthLimit.String(),
+						BandwidthLimitMode: cfg.Transport.BandwidthLimitMode,
+					}
+
+					proxyInfo.ProxyConfig.LoadBalancer = &v1alpha1.LoadBalancerConfig{
+						Group: cfg.LoadBalancer.Group,
+					}
+
+					proxyInfo.ProxyConfig.HealthCheck = &v1alpha1.HealthCheckConfig{
+						Type:            cfg.HealthCheck.Type,
+						IntervalSeconds: int32(cfg.HealthCheck.IntervalSeconds),
+					}
+					proxyInfo.ProxyType = "stcp"
+				case *configv1.SUDPProxyConfig:
+					//{"name":"udp://svc.ns.cluster:7000/pod/10.0.0.1","type":"sudp","transport":{"bandwidthLimit":"","bandwidthLimitMode":"client"},"loadBalancer":{"group":""},"healthCheck":{"type":"","intervalSeconds":0},"localIP":"127.0.0.1","plugin":null,"secretKey":"abc001"}
+					proxyInfo.ProxyConfig = v1alpha1.ProxyConfig{
+						Name:       cfg.Name,
+						Type:       cfg.Type,
+						LocalIP:    cfg.LocalIP,
+						LocalPort:  int32(cfg.LocalPort),
+						SecretKey:  cfg.Secretkey,
+						AllowUsers: cfg.AllowUsers,
+					}
+
+					proxyInfo.ProxyConfig.Transport = &v1alpha1.TransportConfig{
+						BandwidthLimit:     cfg.Transport.BandwidthLimit.String(),
+						BandwidthLimitMode: cfg.Transport.BandwidthLimitMode,
+					}
+
+					proxyInfo.ProxyConfig.LoadBalancer = &v1alpha1.LoadBalancerConfig{
+						Group: cfg.LoadBalancer.Group,
+					}
+
+					proxyInfo.ProxyConfig.HealthCheck = &v1alpha1.HealthCheckConfig{
+						Type:            cfg.HealthCheck.Type,
+						IntervalSeconds: int32(cfg.HealthCheck.IntervalSeconds),
+					}
+
+					proxyInfo.ProxyType = "sudp"
 				default:
 					log.Warnf("unknown proxy type: %s", proxyType)
 					continue
