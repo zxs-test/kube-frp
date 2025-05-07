@@ -31,6 +31,9 @@ type ServerConfig struct {
 	EnableOperator bool `json:"enableOperator,omitempty"`
 
 	Auth AuthServerConfig `json:"auth,omitempty"`
+	// Listen specifies the listen address. Supports network://address scheme, e.g. 0.0.0.0:7000 or /tmp/frp.sock.
+	// If this field is non-empty, BindAddr and BindPort will be ignored.
+	BindListen string `json:"bindListen,omitempty"`
 	// BindAddr specifies the address that the server binds to. By default,
 	// this value is "0.0.0.0".
 	BindAddr string `json:"bindAddr,omitempty"`

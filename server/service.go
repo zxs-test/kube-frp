@@ -24,6 +24,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -223,8 +224,26 @@ func NewService(cfg *v1.ServerConfig) (*Service, error) {
 	}
 
 	// Listen for accepting connections from client.
-	address := net.JoinHostPort(cfg.BindAddr, strconv.Itoa(cfg.BindPort))
-	ln, err := net.Listen("tcp", address)
+	var address, network string
+	if cfg.BindListen == "" {
+		address = net.JoinHostPort(cfg.BindAddr, strconv.Itoa(cfg.BindPort))
+		network = "tcp"
+	} else {
+		raw := cfg.BindListen
+		if strings.HasPrefix(raw, "unix://") {
+			network = "unix"
+			address = strings.TrimPrefix(raw, "unix://")
+			_ = os.Remove(address)
+		} else if strings.Contains(raw, "/") {
+			network = "unix"
+			address = raw
+			_ = os.Remove(address)
+		} else {
+			network = "tcp"
+			address = raw
+		}
+	}
+	ln, err := net.Listen(network, address)
 	if err != nil {
 		return nil, fmt.Errorf("create server listener error, %v", err)
 	}
@@ -237,7 +256,7 @@ func NewService(cfg *v1.ServerConfig) (*Service, error) {
 	ln = svr.muxer.DefaultListener()
 
 	svr.listener = ln
-	log.Infof("frps tcp listen on %s", address)
+	log.Infof("frps listening on %s (%s)", address, network)
 
 	// Listen for accepting connections from client using kcp protocol.
 	if cfg.KCPBindPort > 0 {

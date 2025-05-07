@@ -38,6 +38,9 @@ type ClientCommonConfig struct {
 	// changed to "{user}.{proxy_name}".
 	User string `json:"user,omitempty"`
 
+	// Listen specifies the listen address. Supports network://address scheme, e.g. tcp://0.0.0.0:7000 or unix:///tmp/frp.sock.
+	// If this field is non-empty, BindAddr and BindPort will be ignored.
+	ServerListen string `json:"bindListen,omitempty"`
 	// ServerAddr specifies the address of the server to connect to. By
 	// default, this value is "0.0.0.0".
 	ServerAddr string `json:"serverAddr,omitempty"`

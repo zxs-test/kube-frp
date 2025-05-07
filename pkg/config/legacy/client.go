@@ -34,6 +34,9 @@ import (
 type ClientCommonConf struct {
 	legacyauth.ClientConfig `ini:",extends"`
 
+	// Listen specifies the listen address. Supports network://address scheme, e.g. 0.0.0.0:7000 or /tmp/frp.sock.
+	// If this field is non-empty, BindAddr and BindPort will be ignored.
+	ServerListen string `json:"bindListen,omitempty"`
 	// ServerAddr specifies the address of the server to connect to. By
 	// default, this value is "0.0.0.0".
 	ServerAddr string `ini:"server_addr" json:"server_addr"`

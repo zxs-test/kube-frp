@@ -156,6 +156,7 @@ func RegisterClientCommonConfigFlags(cmd *cobra.Command, c *v1.ClientCommonConfi
 	}
 
 	if !options.sshMode {
+		cmd.PersistentFlags().StringVarP(&c.ServerListen, "server_listen", "", "", "frp server's listen address, e.g. tcp://127.0.0.1:7000 or unix:///tmp/frp.sock.")
 		cmd.PersistentFlags().StringVarP(&c.ServerAddr, "server_addr", "s", "127.0.0.1", "frp server's address")
 		cmd.PersistentFlags().IntVarP(&c.ServerPort, "server_port", "P", 7000, "frp server's port")
 		cmd.PersistentFlags().StringVarP(&c.Transport.Protocol, "protocol", "p", "tcp",
@@ -228,6 +229,7 @@ func (f *BoolFuncFlag) Type() string {
 }
 
 func RegisterServerConfigFlags(cmd *cobra.Command, c *v1.ServerConfig, opts ...RegisterFlagOption) {
+	cmd.PersistentFlags().StringVarP(&c.BindListen, "bind_listen", "", ":7000", "listen address, e.g. 0.0.0.0:7000 or /tmp/frp.sock.")
 	cmd.PersistentFlags().StringVarP(&c.BindAddr, "bind_addr", "", "0.0.0.0", "bind address")
 	cmd.PersistentFlags().IntVarP(&c.BindPort, "bind_port", "p", 7000, "bind port")
 	cmd.PersistentFlags().IntVarP(&c.KCPBindPort, "kcp_bind_port", "", 0, "kcp bind udp port")

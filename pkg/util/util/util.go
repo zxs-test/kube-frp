@@ -134,3 +134,12 @@ func RandomSleep(duration time.Duration, minRatio, maxRatio float64) time.Durati
 func ConstantTimeEqString(a, b string) bool {
 	return subtle.ConstantTimeCompare([]byte(a), []byte(b)) == 1
 }
+
+func SplitNetworkAddress(addr string) (network, address string) {
+	parts := strings.Split(addr, "://")
+	if len(parts) == 2 {
+		network = parts[0]
+		address = parts[1]
+	}
+	return
+}

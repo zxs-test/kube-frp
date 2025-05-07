@@ -89,9 +89,10 @@ func (c *defaultConnectorImpl) Open() error {
 		}
 		tlsConfig.NextProtos = []string{"frp"}
 
+		var serverListen = net.JoinHostPort(c.cfg.ServerAddr, strconv.Itoa(c.cfg.ServerPort))
 		conn, err := quic.DialAddr(
 			c.ctx,
-			net.JoinHostPort(c.cfg.ServerAddr, strconv.Itoa(c.cfg.ServerPort)),
+			serverListen,
 			tlsConfig, &quic.Config{
 				MaxIdleTimeout:     time.Duration(c.cfg.Transport.QUIC.MaxIdleTimeout) * time.Second,
 				MaxIncomingStreams: int64(c.cfg.Transport.QUIC.MaxIncomingStreams),
@@ -199,6 +200,20 @@ func (c *defaultConnectorImpl) realConnect() (net.Conn, error) {
 	if c.cfg.Transport.ConnectServerLocalIP != "" {
 		dialOptions = append(dialOptions, libnet.WithLocalAddr(c.cfg.Transport.ConnectServerLocalIP))
 	}
+
+	var serverListen = c.cfg.ServerListen
+	if serverListen != "" {
+		raw := serverListen
+		if strings.Contains(raw, "/") {
+			protocol = "unix"
+			serverListen = raw
+		} else {
+			serverListen = raw
+		}
+	} else {
+		serverListen = net.JoinHostPort(c.cfg.ServerAddr, strconv.Itoa(c.cfg.ServerPort))
+	}
+
 	dialOptions = append(dialOptions,
 		libnet.WithProtocol(protocol),
 		libnet.WithTimeout(time.Duration(c.cfg.Transport.DialServerTimeout)*time.Second),
@@ -206,9 +221,10 @@ func (c *defaultConnectorImpl) realConnect() (net.Conn, error) {
 		libnet.WithProxy(proxyType, addr),
 		libnet.WithProxyAuth(auth),
 	)
+
 	conn, err := libnet.DialContext(
 		c.ctx,
-		net.JoinHostPort(c.cfg.ServerAddr, strconv.Itoa(c.cfg.ServerPort)),
+		serverListen,
 		dialOptions...,
 	)
 	return conn, err
